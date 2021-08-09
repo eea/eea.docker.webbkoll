@@ -1,4 +1,4 @@
-FROM elixir
+FROM elixir:1.11
 
 COPY ./docker-entrypoint.sh /
 
@@ -15,17 +15,18 @@ RUN git clone https://github.com/andersju/webbkoll.git
 
 WORKDIR /webbkoll
 
-RUN mix local.hex --force && \
+RUN git reset --hard 295c651f5f1c0c26cc00499b889f8608df4a3976
+RUN touch config/dev.secret.exs && \
+    touch config/prod.secret.exs
+
+RUN mix local.hex --force && \    
     mix deps.get --only prod && \
     mix local.rebar --force && \
     MIX_ENV=prod mix compile && \
     mkdir -p priv/static/css priv/static/fonts priv/static/images priv/static/js && \
     /sassc/sassc/bin/sassc --style compressed assets/scss/style.scss priv/static/css/app.css && \
-    cat assets/static/js/* > priv/static/js/webbkoll.js && \
+    cat assets/static/js/webbkoll-* > priv/static/js/webbkoll.js && \
     rsync -av assets/static/*  priv/static && \
-    MIX_ENV=prod mix phx.digest && \
-    sed -i 's#rate_limit_host: %{"scale" => 60_000, "limit" => .*},#rate_limit_host: %{"scale" => 60_000, "limit" => 1000},#' config/prod.exs && \
-    sed -i 's#rate_limit_client: %{"scale" => 60_000, "limit" => .*},#rate_limit_client: %{"scale" => 60_000, "limit" => 1000},#' config/prod.exs
-
+    MIX_ENV=prod mix phx.digest
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
