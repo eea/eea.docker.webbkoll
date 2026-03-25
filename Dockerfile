@@ -1,4 +1,4 @@
-FROM elixir:1.11
+FROM elixir:1.16
 
 COPY ./docker-entrypoint.sh /
 
@@ -11,13 +11,10 @@ RUN mkdir -p /sassc && cd /sassc && \
 RUN apt update
 RUN apt install rsync -y
 
-RUN git clone https://github.com/andersju/webbkoll.git
+RUN git clone https://codeberg.org/dataskydd.net/webbkoll.git
 
 WORKDIR /webbkoll
 
-RUN git reset --hard 295c651f5f1c0c26cc00499b889f8608df4a3976
-RUN touch config/dev.secret.exs && \
-    touch config/prod.secret.exs
 
 RUN mix local.hex --force && \    
     mix deps.get --only prod && \
