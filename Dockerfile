@@ -1,8 +1,5 @@
 FROM elixir:1.16
 
-COPY ./docker-entrypoint.sh /
-
-
 RUN mkdir -p /sassc && cd /sassc && \
     git clone https://github.com/sass/sassc.git && \
     . sassc/script/bootstrap && \
@@ -15,7 +12,6 @@ RUN git clone https://codeberg.org/dataskydd.net/webbkoll.git
 
 WORKDIR /webbkoll
 
-
 RUN mix local.hex --force && \    
     mix deps.get --only prod && \
     mix local.rebar --force && \
@@ -25,5 +21,9 @@ RUN mix local.hex --force && \
     cat assets/static/js/webbkoll-* > priv/static/js/webbkoll.js && \
     rsync -av assets/static/*  priv/static && \
     MIX_ENV=prod mix phx.digest
+
+COPY ./docker-entrypoint.sh /
+
+RUN echo 'config :webbkoll, WebbkollWeb.Endpoint, backend_url: "http://'$BACKEND_HOST':'$BACKEND_PORT'"' >> /webbkoll/config/prod.exs
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
