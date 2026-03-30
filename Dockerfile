@@ -24,6 +24,4 @@ RUN mix local.hex --force && \
 
 COPY ./docker-entrypoint.sh /
 
-RUN echo 'config :webbkoll, WebbkollWeb.Endpoint, backend_url: "http://'$BACKEND_HOST':'$BACKEND_PORT'"' >> /webbkoll/config/prod.exs
-
 ENTRYPOINT ["/docker-entrypoint.sh"]
