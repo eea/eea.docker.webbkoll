@@ -8,7 +8,7 @@ RUN mkdir -p /sassc && cd /sassc && \
 RUN apt update
 RUN apt install rsync -y
 
-RUN git clone https://codeberg.org/dataskydd.net/webbkoll.git
+RUN git clone --depth 1 https://codeberg.org/dataskydd.net/webbkoll.git
 
 WORKDIR /webbkoll
 
